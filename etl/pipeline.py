@@ -20,8 +20,8 @@ class ETLPipeline:
             raw_data = self.extractor.extract(last_sync_time)
             validated_data = [MovieDataSchema(**movie).model_dump(mode='json') for movie in raw_data]
             self.loader.load(validated_data)
-            logger.info(f'Finished ETL pipeline. Objects processed: {len(validated_data)}')
         except Exception as error:
             logger.exception(f'Error during pipeline execution: {error}')
         else:
             self.state.set_state('last_sync_time', datetime.now().isoformat())
+            logger.info(f'Finished ETL pipeline. Objects processed: {len(validated_data)}')

@@ -26,8 +26,8 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-    expose:
-      - ${ELASTIC_PORT}
+    ports:
+      - "${ELASTIC_PORT}:${ELASTIC_PORT}"
     volumes:
       - elastic_volume:/usr/share/elasticsearch/data
 

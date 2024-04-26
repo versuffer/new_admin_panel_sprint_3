@@ -33,7 +33,7 @@ def run_pipeline() -> None:
 if __name__ == '__main__':
     scheduler = BackgroundScheduler()
     scheduler.add_job(
-        run_pipeline, 'interval', minutes=2, max_instances=1, misfire_grace_time=5 * 60, next_run_time=datetime.now()
+        run_pipeline, 'interval', minutes=1, max_instances=1, misfire_grace_time=5 * 60, next_run_time=datetime.now()
     )
 
     with scheduler_context(scheduler):
