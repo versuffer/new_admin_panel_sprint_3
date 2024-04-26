@@ -1,0 +1,42 @@
+version: '3.8'
+
+volumes:
+  postgres_volume:
+  elastic_volume:
+
+services:
+  postgres_database:
+    image: postgres:16.2
+    container_name: postgres_database
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+    expose:
+      - ${POSTGRES_PORT}
+
+  elasticsearch:
+    image: elasticsearch:8.7.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    expose:
+      - ${ELASTIC_PORT}
+    volumes:
+      - elastic_volume:/usr/share/elasticsearch/data
+
+  etl:
+    build:
+      dockerfile: ./Dockerfile
+    container_name: etl
+    env_file:
+      - ".env"
+    environment:
+      POSTGRES_HOST: postgres_database
+    depends_on:
+      - postgres_database
+      - elasticsearch

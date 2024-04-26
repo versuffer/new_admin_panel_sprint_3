@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "movies_admin"
+version = "1.6.1"
+description = ""
+authors = ["Sergey Nosov <versuffer@mail.ru>"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psycopg2-binary = "2.9.9"
+python-dotenv = "1.0.1"
+apscheduler = "^3.10.4"
+backoff = "^2.2.1"
+pydantic = "^2.7.1"
+elasticsearch = "^8.13.0"
+
+[tool.poetry.group.dev.dependencies]
+isort = "*"
+black = "*"
+flake8 = "*"
+mypy = "*"
+
+[tool.isort]
+profile = 'black'
+
+[tool.bandit]
+exclude_dirs = ["__pycache__"]
+
+[tool.black]
+line-length = 120
+skip-string-normalization = 1
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+exclude = [
+    "^__pycache__$",
+]
