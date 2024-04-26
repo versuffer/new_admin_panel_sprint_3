@@ -1,8 +1,8 @@
-import os
 from contextlib import contextmanager
 
 import backoff
 import elastic_transport
+from config.app_settings import app_settings
 from config.log_settings import logger
 from data.elastic_index import index
 from elasticsearch import Elasticsearch, helpers
@@ -24,9 +24,9 @@ class ElasticsearchLoader:
         self.elastic = Elasticsearch(
             hosts=[
                 {
-                    'scheme': os.environ.get('ELASTIC_SCHEMA'),
-                    'host': os.environ.get('ELASTIC_HOST'),
-                    'port': int(os.environ.get('ELASTIC_PORT')),
+                    'scheme': app_settings.ELASTIC_SCHEMA,
+                    'host': app_settings.ELASTIC_HOST,
+                    'port': app_settings.ELASTIC_PORT,
                 }
             ],
             timeout=5,

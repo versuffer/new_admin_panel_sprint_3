@@ -1,8 +1,8 @@
-import os
 from contextlib import contextmanager
 
 import backoff
 import psycopg2
+from config.app_settings import app_settings
 from config.log_settings import logger
 from data.sql_queries import get_all_sql, get_last_modified_sql
 from psycopg2.extras import DictCursor
@@ -42,11 +42,11 @@ def postgres_connection(connection_config: dict):
 class PostgresExtractor:
     def __init__(self):
         self.connection_config = {
-            'dbname': os.environ.get('POSTGRES_DB'),
-            'user': os.environ.get('POSTGRES_USER'),
-            'password': os.environ.get('POSTGRES_PASSWORD'),
-            'host': os.environ.get('POSTGRES_HOST'),
-            'port': int(os.environ.get('POSTGRES_PORT')),
+            'dbname': app_settings.POSTGRES_DB,
+            'user': app_settings.POSTGRES_USER,
+            'password': app_settings.POSTGRES_PASSWORD,
+            'host': app_settings.POSTGRES_HOST,
+            'port': app_settings.POSTGRES_PORT,
         }
         self.get_all_sql = get_all_sql
         self.get_last_modified_sql = get_last_modified_sql

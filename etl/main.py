@@ -1,9 +1,9 @@
-import os
 from contextlib import contextmanager
 from datetime import datetime
 from time import sleep
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from config.app_settings import app_settings
 from config.log_settings import logger
 from dotenv import load_dotenv
 from drivers.storage import JsonFileStorage
@@ -24,7 +24,7 @@ def scheduler_context(scheduler: BackgroundScheduler):
 
 
 def run_pipeline() -> None:
-    storage = JsonFileStorage(os.environ['STATE_FILE_NAME'])
+    storage = JsonFileStorage(app_settings.STATE_FILE_NAME)
     state = State(storage)
     pipeline = ETLPipeline(state)
     pipeline.run()

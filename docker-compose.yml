@@ -2,6 +2,7 @@ version: '3.8'
 
 volumes:
   postgres_volume:
+  dumps:
   elastic_volume:
 
 services:
@@ -14,6 +15,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_PORT: ${POSTGRES_PORT}
     volumes:
+      - ./dumps/movies_database_dump.sql:/docker-entrypoint-initdb.d/movies_database_dump.sql:ro
       - postgres_volume:/var/lib/postgresql/data/
     expose:
       - ${POSTGRES_PORT}
@@ -37,6 +39,7 @@ services:
       - ".env"
     environment:
       POSTGRES_HOST: postgres_database
+      ELASTIC_HOST: elasticsearch
     depends_on:
       - postgres_database
       - elasticsearch
