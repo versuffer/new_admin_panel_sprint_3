@@ -20,3 +20,14 @@ class MovieDataSchema(BaseModel):
     directors: list[PersonSchema]
     actors: list[PersonSchema]
     writers: list[PersonSchema]
+
+
+class GenreDataSchema(BaseModel):
+    id: UUID
+    name: str
+    description: str | None = None
+
+
+class PersonDataSchema(BaseModel):
+    id: UUID
+    full_name: str

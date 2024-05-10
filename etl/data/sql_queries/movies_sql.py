@@ -23,8 +23,8 @@ SELECT "content"."film_work"."id",
   LEFT OUTER JOIN "content"."person"
     ON ("content"."person_film_work"."person_id" = "content"."person"."id")
   """
-_updated_at_filter_sql = 'WHERE "content"."film_work"."updated_at" > %s OR "content"."person"."updated_at" > %s OR "content"."genre"."updated_at" > %s'
+_updated_at_filter_sql = 'WHERE "content"."film_work"."updated_at" > {last_sync_time} OR "content"."person"."updated_at" > {last_sync_time} OR "content"."genre"."updated_at" > {last_sync_time}'
 _group_by_sql = 'GROUP BY "content"."film_work"."id"'
 
-get_last_modified_sql = _base_sql + _updated_at_filter_sql + _group_by_sql
-get_all_sql = _base_sql + _group_by_sql
+get_last_modified_movies_sql = _base_sql + _updated_at_filter_sql + _group_by_sql
+get_all_movies_sql = _base_sql + _group_by_sql

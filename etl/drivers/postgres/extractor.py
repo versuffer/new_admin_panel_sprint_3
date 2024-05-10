@@ -4,7 +4,6 @@ import backoff
 import psycopg2
 from config.app_settings import app_settings
 from config.log_settings import logger
-from data.sql_queries import get_all_sql, get_last_modified_sql
 from psycopg2.extras import DictCursor
 
 
@@ -48,15 +47,15 @@ class PostgresExtractor:
             'host': app_settings.POSTGRES_HOST,
             'port': app_settings.POSTGRES_PORT,
         }
-        self.get_all_sql = get_all_sql
-        self.get_last_modified_sql = get_last_modified_sql
 
-    def extract(self, last_sync_time: str | None) -> list[dict]:
+    def extract(self, last_sync_time: str | None, sql_queries_mapping: dict) -> list[dict]:
         with postgres_connection(self.connection_config) as connection:
             with connection.cursor(cursor_factory=DictCursor) as cursor:
                 if last_sync_time:
-                    cursor.execute(self.get_last_modified_sql, (last_sync_time, last_sync_time, last_sync_time))
+                    cursor.execute(
+                        sql_queries_mapping['get_last_modified'].format(last_sync_time=f"'{last_sync_time}'")
+                    )
                 else:
-                    cursor.execute(self.get_all_sql)
+                    cursor.execute(sql_queries_mapping['get_all'])
 
                 return [dict(entry) for entry in cursor]

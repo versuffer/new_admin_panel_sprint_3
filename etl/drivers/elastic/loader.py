@@ -4,7 +4,9 @@ import backoff
 import elastic_transport
 from config.app_settings import app_settings
 from config.log_settings import logger
-from data.elastic_index import index
+from data.elastic_indexes.genres_index import genres_index
+from data.elastic_indexes.movies_index import movies_index
+from data.elastic_indexes.persons_index import persons_index
 from elasticsearch import Elasticsearch, helpers
 
 
@@ -14,6 +16,7 @@ def elastic_manager(elastic: Elasticsearch):
         yield
     except (elastic_transport.ConnectionError, elastic_transport.ConnectionTimeout) as error:
         logger.error(f'Unexpected Elasticsearch error. {error}')
+        raise error
     finally:
         if elastic:
             elastic.close()
@@ -31,8 +34,11 @@ class ElasticsearchLoader:
             ],
             timeout=5,
         )
-        self.elastic_index_name = "movies"
-        self.elastic_index_config = index
+        self.elastic_indexes = {
+            'movies': movies_index,
+            'genres': genres_index,
+            'persons': persons_index,
+        }
 
     @backoff.on_exception(
         backoff.expo,
@@ -40,9 +46,9 @@ class ElasticsearchLoader:
         max_tries=5,
         max_time=5,
     )
-    def _create_index(self) -> None:
-        if not self.elastic.indices.exists(index=self.elastic_index_name):
-            self.elastic.indices.create(index=self.elastic_index_name, body=self.elastic_index_config)
+    def _create_index(self, index_name: str) -> None:
+        if not self.elastic.indices.exists(index=index_name):
+            self.elastic.indices.create(index=index_name, body=self.elastic_indexes[index_name])
 
     @backoff.on_exception(
         backoff.expo,
@@ -50,14 +56,12 @@ class ElasticsearchLoader:
         max_tries=5,
         max_time=5,
     )
-    def _load_bulk(self, data: list[dict]) -> None:
+    def _load_bulk(self, index_name: str, data: list[dict]) -> None:
         data_bulk = [
-            {'_op_type': 'index', '_index': self.elastic_index_name, '_id': movie["id"], '_source': movie}
-            for movie in data
+            {'_op_type': 'index', '_index': index_name, '_id': entry["id"], '_source': entry} for entry in data
         ]
         helpers.bulk(self.elastic, data_bulk)
 
-    def load(self, data: list[dict]) -> None:
-        with elastic_manager(self.elastic):
-            self._create_index()
-            self._load_bulk(data)
+    def load(self, index_name: str, data: list[dict]) -> None:
+        self._create_index(index_name)
+        self._load_bulk(index_name, data)
